@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:48px;">
+    <div class="container section-head">
+      <span class="eyebrow">Our Story</span>
+      <h1>About City Mega Church</h1>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container grid grid-2" style="gap:64px;">
+      <div>
+        <h3>Our History</h3>
+        <p class="mt-32" id="historyText">Loading...</p>
+      </div>
+      <div>
+        <h3>Our Vision</h3>
+        <p class="mt-32" id="visionText">Loading...</p>
+        <h3 class="mt-32">Our Mission</h3>
+        <p class="mt-32" id="missionText">Loading...</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg-raised);">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">What We Stand On</span>
+        <h2>Core Values</h2>
+      </div>
+      <div class="grid grid-3" id="coreValuesGrid">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container grid grid-2" style="align-items:center; gap:64px;">
+      <img id="pastorImage" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&q=80" alt="Lead Pastor" style="border-radius:16px; aspect-ratio:4/5; object-fit:cover;" />
+      <div>
+        <span class="eyebrow">Leadership</span>
+        <h2 class="mt-32" id="pastorName">Our Lead Pastor</h2>
+        <p class="mt-32" id="pastorBio">Loading...</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    api('/church-info').then(info => {
+      document.getElementById('historyText').textContent = info.history || 'Our story is still being written — check back soon.';
+      document.getElementById('visionText').textContent = info.vision || 'Coming soon.';
+      document.getElementById('missionText').textContent = info.mission || 'Coming soon.';
+
+      const grid = document.getElementById('coreValuesGrid');
+      if (info.core_values && info.core_values.length) {
+        grid.innerHTML = info.core_values.map(v => `
+          <div class="card"><div class="card-body"><h3>${v}</h3></div></div>
+        `).join('');
+      } else {
+        grid.innerHTML = '<div class="empty-state">Core values coming soon.</div>';
+      }
+
+      if (info.lead_pastor_name) document.getElementById('pastorName').textContent = info.lead_pastor_name;
+      if (info.lead_pastor_bio) document.getElementById('pastorBio').textContent = info.lead_pastor_bio;
+      if (info.lead_pastor_image_url) document.getElementById('pastorImage').src = info.lead_pastor_image_url;
+    }).catch(() => {});
+  </script>
+</body>
+</html>

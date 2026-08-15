@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:48px;">
+    <div class="container section-head">
+      <span class="eyebrow">Save the Date</span>
+      <h1>Upcoming Events</h1>
+      <p>Everything happening at City Mega Church, all in one place.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container grid grid-3" id="eventsGrid">
+      <div class="loading-spinner"></div>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    api('/content?type=events').then(events => {
+      const grid = document.getElementById('eventsGrid');
+      const sorted = events.slice().sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+      if (!sorted.length) {
+        grid.innerHTML = '<div class="empty-state">No events scheduled right now — check back soon.</div>';
+        return;
+      }
+      grid.innerHTML = sorted.map(e => `
+        <div class="card">
+          ${e.image_url ? `<img src="${e.image_url}" alt="${e.title}" />` : ''}
+          <div class="card-body">
+            <div class="card-meta">${formatDate(e.event_date)}${e.event_time ? ' · ' + e.event_time : ''}</div>
+            <h3>${e.title}</h3>
+            ${e.venue ? `<p style="margin-bottom:8px;"><strong style="color:var(--fg);">Venue:</strong> ${e.venue}</p>` : ''}
+            <p>${e.description || ''}</p>
+          </div>
+        </div>
+      `).join('');
+    }).catch(() => {
+      document.getElementById('eventsGrid').innerHTML = '<div class="empty-state">Unable to load events.</div>';
+    });
+  </script>
+</body>
+</html>

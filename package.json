@@ -1,0 +1,14 @@
+{
+  "name": "citymegachurch",
+  "version": "1.0.0",
+  "description": "City Mega Church website and prayer camp booking system",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

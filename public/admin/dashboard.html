@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Overview — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+</head>
+<body>
+
+  <div class="admin-page-head">
+    <div>
+      <h1>Overview</h1>
+      <p>A snapshot of bookings and activity across the church.</p>
+    </div>
+  </div>
+
+  <div class="stat-grid" id="statGrid">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div class="grid grid-2" style="gap:32px; align-items:start;">
+    <div>
+      <h3 style="margin-bottom:16px;">Upcoming Camps</h3>
+      <div class="admin-table-wrap">
+        <div class="admin-table-scroll">
+          <table class="admin-table" id="upcomingCampsTable">
+            <thead><tr><th>Camp</th><th>Dates</th><th>Spaces</th></tr></thead>
+            <tbody><tr><td colspan="3" style="text-align:center; padding:32px;">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:16px;">Recent Registrations</h3>
+      <div class="admin-table-wrap">
+        <div class="admin-table-scroll">
+          <table class="admin-table" id="recentBookingsTable">
+            <thead><tr><th>Name</th><th>Camp</th><th>Status</th></tr></thead>
+            <tbody><tr><td colspan="3" style="text-align:center; padding:32px;">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/admin/js/admin-layout.js"></script>
+  <script>
+    const badgeClass = { Pending: 'badge-pending', Approved: 'badge-approved', Declined: 'badge-declined' };
+
+    api('/admin-stats', { auth: true }).then(stats => {
+      document.getElementById('statGrid').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total Bookings</div><div class="stat-value">${stats.total_bookings}</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value">${stats.pending_bookings}</div></div>
+        <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value">${stats.approved_bookings}</div></div>
+        <div class="stat-card"><div class="stat-label">Registered Users</div><div class="stat-value">${stats.total_users}</div></div>
+      `;
+
+      const campsBody = document.querySelector('#upcomingCampsTable tbody');
+      if (!stats.upcoming_camps.length) {
+        campsBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:32px; color:var(--fg-dim);">No upcoming camps.</td></tr>';
+      } else {
+        campsBody.innerHTML = stats.upcoming_camps.map(c => `
+          <tr>
+            <td>${escapeHtml(c.name)}</td>
+            <td>${formatDate(c.start_date)} &ndash; ${formatDate(c.end_date)}</td>
+            <td>${c.available_spaces} / ${c.max_participants} left</td>
+          </tr>
+        `).join('');
+      }
+
+      const bookingsBody = document.querySelector('#recentBookingsTable tbody');
+      if (!stats.recent_bookings.length) {
+        bookingsBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:32px; color:var(--fg-dim);">No bookings yet.</td></tr>';
+      } else {
+        bookingsBody.innerHTML = stats.recent_bookings.map(b => `
+          <tr>
+            <td>${escapeHtml(b.full_name)}</td>
+            <td>${escapeHtml(b.prayer_camps ? b.prayer_camps.name : '—')}</td>
+            <td><span class="badge ${badgeClass[b.status]}">${escapeHtml(b.status)}</span></td>
+          </tr>
+        `).join('');
+      }
+    }).catch(err => {
+      document.getElementById('statGrid').innerHTML = `<div class="empty-state">Unable to load stats: ${escapeHtml(err.message)}</div>`;
+    });
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+  </script>
+</body>
+</html>

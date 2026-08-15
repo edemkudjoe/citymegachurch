@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sermons — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:48px;">
+    <div class="container section-head">
+      <span class="eyebrow">The Word</span>
+      <h1>Sermons</h1>
+      <p>Catch up on messages, wherever you are.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container grid grid-3" id="sermonsGrid">
+      <div class="loading-spinner"></div>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    function youtubeThumb(url) {
+      if (!url) return null;
+      const match = url.match(/(?:youtu\.be\/|v=|embed\/)([a-zA-Z0-9_-]{11})/);
+      return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
+    }
+
+    api('/content?type=sermons').then(sermons => {
+      const grid = document.getElementById('sermonsGrid');
+      const sorted = sermons.slice().sort((a, b) => new Date(b.sermon_date || 0) - new Date(a.sermon_date || 0));
+      if (!sorted.length) {
+        grid.innerHTML = '<div class="empty-state">Sermons coming soon.</div>';
+        return;
+      }
+      grid.innerHTML = sorted.map(s => {
+        const thumb = s.cover_image_url || youtubeThumb(s.youtube_url);
+        return `
+        <div class="card">
+          ${thumb ? `<img src="${thumb}" alt="${s.title}" />` : ''}
+          <div class="card-body">
+            <div class="card-meta">${s.sermon_date ? formatDate(s.sermon_date) : ''}${s.speaker ? ' · ' + s.speaker : ''}</div>
+            <h3>${s.title}</h3>
+            <p>${s.description || ''}</p>
+            <div style="display:flex; gap:12px; margin-top:16px;">
+              ${s.youtube_url ? `<a href="${s.youtube_url}" target="_blank" rel="noopener" class="btn btn-outline" style="padding:10px 18px; font-size:0.85rem;">Watch</a>` : ''}
+              ${s.audio_url ? `<a href="${s.audio_url}" target="_blank" rel="noopener" class="btn btn-outline" style="padding:10px 18px; font-size:0.85rem;">Listen</a>` : ''}
+              ${s.notes_url ? `<a href="${s.notes_url}" target="_blank" rel="noopener" class="btn btn-outline" style="padding:10px 18px; font-size:0.85rem;">Notes</a>` : ''}
+            </div>
+          </div>
+        </div>
+      `}).join('');
+    }).catch(() => {
+      document.getElementById('sermonsGrid').innerHTML = '<div class="empty-state">Unable to load sermons.</div>';
+    });
+  </script>
+</body>
+</html>

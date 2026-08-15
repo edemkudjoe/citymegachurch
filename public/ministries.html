@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ministries — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:48px;">
+    <div class="container section-head">
+      <span class="eyebrow">Get Involved</span>
+      <h1>Our Ministries</h1>
+      <p>Find your place to serve, grow, and connect.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container grid grid-3" id="ministriesGrid">
+      <div class="loading-spinner"></div>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    api('/content?type=ministries').then(ministries => {
+      const grid = document.getElementById('ministriesGrid');
+      if (!ministries.length) {
+        grid.innerHTML = '<div class="empty-state">Ministry list coming soon.</div>';
+        return;
+      }
+      grid.innerHTML = ministries.map(m => `
+        <div class="card">
+          ${m.image_url ? `<img src="${m.image_url}" alt="${m.name}" />` : ''}
+          <div class="card-body">
+            <h3>${m.name}</h3>
+            ${m.leader_name ? `<div class="card-meta">Led by ${m.leader_name}</div>` : ''}
+            <p>${m.description || ''}</p>
+          </div>
+        </div>
+      `).join('');
+    }).catch(() => {
+      document.getElementById('ministriesGrid').innerHTML = '<div class="empty-state">Unable to load ministries.</div>';
+    });
+  </script>
+</body>
+</html>

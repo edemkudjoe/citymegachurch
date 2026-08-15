@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Services — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:48px;">
+    <div class="container section-head">
+      <span class="eyebrow">Join Us</span>
+      <h1>Service Times</h1>
+      <p>Come as you are, every week. Here's when and where we gather.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container grid grid-3" id="servicesGrid">
+      <div class="loading-spinner"></div>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    api('/content?type=services').then(services => {
+      const grid = document.getElementById('servicesGrid');
+      if (!services.length) {
+        grid.innerHTML = '<div class="empty-state">Service times coming soon.</div>';
+        return;
+      }
+      grid.innerHTML = services.map(s => `
+        <div class="card">
+          <div class="card-body">
+            <div class="card-meta">${s.day_of_week} · ${s.time}</div>
+            <h3>${s.name}</h3>
+            ${s.venue ? `<p style="margin-bottom:8px;"><strong style="color:var(--fg);">Venue:</strong> ${s.venue}</p>` : ''}
+            <p>${s.description || ''}</p>
+          </div>
+        </div>
+      `).join('');
+    }).catch(() => {
+      document.getElementById('servicesGrid').innerHTML = '<div class="empty-state">Unable to load service times.</div>';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check Booking Status — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    .result-card { display: none; }
+  </style>
+</head>
+<body>
+
+  <section style="padding-top:160px; min-height:70vh;">
+    <div class="container" style="max-width:520px;">
+      <div class="text-center mb-32">
+        <span class="eyebrow">Prayer Camp</span>
+        <h1 style="font-size:2.2rem; margin-top:12px;">Check Booking Status</h1>
+        <p class="mt-32">Enter your booking reference to see its current status.</p>
+      </div>
+
+      <form id="lookupForm">
+        <div class="form-group">
+          <label for="ref">Booking Reference</label>
+          <input type="text" id="ref" placeholder="e.g. CMC-2026-0001" required style="text-transform:uppercase;" />
+        </div>
+        <div class="form-error" id="formError"></div>
+        <button type="submit" class="btn btn-primary btn-block mt-32" id="submitBtn">Check Status</button>
+      </form>
+
+      <div class="card mt-32 result-card" id="resultCard">
+        <div class="card-body">
+          <div class="card-meta" id="resultRef"></div>
+          <h3 id="resultName"></h3>
+          <p class="mt-32" id="resultCamp"></p>
+          <div class="mt-32" id="resultBadge"></div>
+        </div>
+      </div>
+
+      <p class="text-center mt-32">
+        Have an account? <a href="/login.html" style="color:var(--accent-light);">Log in</a> to view all your bookings.
+      </p>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    async function lookupBooking(ref) {
+      const errorEl = document.getElementById('formError');
+      const btn = document.getElementById('submitBtn');
+      const resultCard = document.getElementById('resultCard');
+      errorEl.classList.remove('visible');
+      resultCard.style.display = 'none';
+
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+
+      try {
+        const data = await api(`/bookings?ref=${encodeURIComponent(ref)}`);
+        document.getElementById('resultRef').textContent = data.booking_ref;
+        document.getElementById('resultName').textContent = data.full_name;
+        document.getElementById('resultCamp').textContent = data.prayer_camps
+          ? `${data.prayer_camps.name} · ${formatDate(data.prayer_camps.start_date)} – ${formatDate(data.prayer_camps.end_date)}`
+          : '';
+        const badgeClass = { Pending: 'badge-pending', Approved: 'badge-approved', Declined: 'badge-declined' }[data.status];
+        document.getElementById('resultBadge').innerHTML = `<span class="badge ${badgeClass}">${escapeHtml(data.status)}</span>`;
+        resultCard.style.display = 'block';
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Check Status';
+      }
+    }
+
+    document.getElementById('lookupForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      lookupBooking(document.getElementById('ref').value.trim());
+    });
+
+    // Auto-lookup if ?ref= is present in the URL
+    const params = new URLSearchParams(window.location.search);
+    const prefilledRef = params.get('ref');
+    if (prefilledRef) {
+      document.getElementById('ref').value = prefilledRef;
+      lookupBooking(prefilledRef);
+    }
+  </script>
+</body>
+</html>

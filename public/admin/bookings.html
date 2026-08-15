@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Bookings — City Mega Church Admin</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+</head>
+<body>
+
+  <div class="admin-page-head">
+    <div>
+      <h1>Camp Bookings</h1>
+      <p>Review, approve, decline, and manage registrations.</p>
+    </div>
+  </div>
+
+  <div class="admin-toolbar">
+    <input type="search" id="searchInput" placeholder="Search by name, email, phone, or reference..." />
+    <select id="statusFilter">
+      <option value="">All Statuses</option>
+      <option value="Pending">Pending</option>
+      <option value="Approved">Approved</option>
+      <option value="Declined">Declined</option>
+    </select>
+    <select id="campFilter">
+      <option value="">All Camps</option>
+    </select>
+  </div>
+
+  <div class="admin-table-wrap">
+    <div class="admin-table-scroll">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Name</th>
+            <th>Camp</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsBody">
+          <tr><td colspan="6" style="text-align:center; padding:40px;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Edit/View Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+      <h3>Booking Details</h3>
+      <form id="editForm">
+        <input type="hidden" id="editId" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editFullName">Full Name</label>
+            <input type="text" id="editFullName" required />
+          </div>
+          <div class="form-group">
+            <label for="editStatus">Status</label>
+            <select id="editStatus">
+              <option>Pending</option>
+              <option>Approved</option>
+              <option>Declined</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editPhone">Phone</label>
+            <input type="tel" id="editPhone" required />
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editGender">Gender</label>
+            <select id="editGender">
+              <option value="">—</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editDob">Date of Birth</label>
+            <input type="date" id="editDob" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="editEmergency">Emergency Contact</label>
+          <input type="text" id="editEmergency" required />
+        </div>
+        <div class="form-group">
+          <label for="editPrayerRequest">Prayer Request</label>
+          <textarea id="editPrayerRequest" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="editNotes">Additional Notes</label>
+          <textarea id="editNotes" rows="2"></textarea>
+        </div>
+        <div class="form-error" id="editError"></div>
+        <div class="modal-close-row">
+          <button type="button" class="btn btn-outline" id="closeEditModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveEditBtn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/admin/js/admin-layout.js"></script>
+  <script>
+    let bookings = [];
+    let camps = [];
+    const badgeClass = { Pending: 'badge-pending', Approved: 'badge-approved', Declined: 'badge-declined' };
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function renderBookings() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const campId = document.getElementById('campFilter').value;
+
+      let filtered = bookings;
+      if (status) filtered = filtered.filter(b => b.status === status);
+      if (campId) filtered = filtered.filter(b => b.camp_id === campId);
+      if (search) {
+        filtered = filtered.filter(b =>
+          b.full_name.toLowerCase().includes(search) ||
+          b.email.toLowerCase().includes(search) ||
+          b.phone_number.toLowerCase().includes(search) ||
+          b.booking_ref.toLowerCase().includes(search)
+        );
+      }
+
+      const body = document.getElementById('bookingsBody');
+      if (!filtered.length) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--fg-dim);">No bookings match.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = filtered.map(b => `
+        <tr>
+          <td>${escapeHtml(b.booking_ref)}</td>
+          <td>${escapeHtml(b.full_name)}</td>
+          <td>${escapeHtml(b.prayer_camps ? b.prayer_camps.name : '—')}</td>
+          <td>${escapeHtml(b.phone_number)}<br/><span style="color:var(--fg-dim); font-size:0.82rem;">${escapeHtml(b.email)}</span></td>
+          <td><span class="badge ${badgeClass[b.status]}">${escapeHtml(b.status)}</span></td>
+          <td>
+            <div class="table-actions">
+              ${b.status !== 'Approved' ? `<button class="icon-btn" data-action="approve" data-id="${b.id}">Approve</button>` : ''}
+              ${b.status !== 'Declined' ? `<button class="icon-btn" data-action="decline" data-id="${b.id}">Decline</button>` : ''}
+              <button class="icon-btn" data-action="edit" data-id="${b.id}">Edit</button>
+              <button class="icon-btn danger" data-action="delete" data-id="${b.id}">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      body.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.id));
+      });
+    }
+
+    async function loadBookings() {
+      try {
+        bookings = await api('/bookings', { auth: true });
+        renderBookings();
+      } catch (err) {
+        document.getElementById('bookingsBody').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px;">Unable to load bookings: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    async function loadCamps() {
+      try {
+        camps = await api('/camps');
+        const select = document.getElementById('campFilter');
+        select.innerHTML = '<option value="">All Camps</option>' +
+          camps.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+      } catch {}
+    }
+
+    async function handleAction(action, id) {
+      const booking = bookings.find(b => b.id === id);
+      if (!booking) return;
+
+      if (action === 'approve' || action === 'decline') {
+        const newStatus = action === 'approve' ? 'Approved' : 'Declined';
+        try {
+          await api(`/bookings?id=${id}`, { method: 'PUT', auth: true, body: { status: newStatus } });
+          showToast(`Booking ${newStatus.toLowerCase()}.`);
+          loadBookings();
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+        return;
+      }
+
+      if (action === 'delete') {
+        if (!confirm(`Delete the booking for ${booking.full_name}? This can't be undone.`)) return;
+        try {
+          await api(`/bookings?id=${id}`, { method: 'DELETE', auth: true });
+          showToast('Booking deleted.');
+          loadBookings();
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+        return;
+      }
+
+      if (action === 'edit') {
+        openEditModal(booking);
+      }
+    }
+
+    function openEditModal(booking) {
+      document.getElementById('editId').value = booking.id;
+      document.getElementById('editFullName').value = booking.full_name;
+      document.getElementById('editStatus').value = booking.status;
+      document.getElementById('editPhone').value = booking.phone_number;
+      document.getElementById('editEmail').value = booking.email;
+      document.getElementById('editGender').value = booking.gender || '';
+      document.getElementById('editDob').value = booking.date_of_birth || '';
+      document.getElementById('editEmergency').value = booking.emergency_contact;
+      document.getElementById('editPrayerRequest').value = booking.prayer_request || '';
+      document.getElementById('editNotes').value = booking.additional_notes || '';
+      document.getElementById('editError').classList.remove('visible');
+      document.getElementById('editModal').classList.add('open');
+    }
+    document.getElementById('closeEditModal').addEventListener('click', () => {
+      document.getElementById('editModal').classList.remove('open');
+    });
+
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const errorEl = document.getElementById('editError');
+      const btn = document.getElementById('saveEditBtn');
+      errorEl.classList.remove('visible');
+
+      const body = {
+        full_name: document.getElementById('editFullName').value.trim(),
+        status: document.getElementById('editStatus').value,
+        phone_number: document.getElementById('editPhone').value.trim(),
+        email: document.getElementById('editEmail').value.trim(),
+        gender: document.getElementById('editGender').value || null,
+        date_of_birth: document.getElementById('editDob').value || null,
+        emergency_contact: document.getElementById('editEmergency').value.trim(),
+        prayer_request: document.getElementById('editPrayerRequest').value.trim() || null,
+        additional_notes: document.getElementById('editNotes').value.trim() || null,
+      };
+
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        await api(`/bookings?id=${id}`, { method: 'PUT', auth: true, body });
+        document.getElementById('editModal').classList.remove('open');
+        showToast('Booking updated.');
+        loadBookings();
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+      }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', renderBookings);
+    document.getElementById('statusFilter').addEventListener('change', renderBookings);
+    document.getElementById('campFilter').addEventListener('change', renderBookings);
+
+    loadBookings();
+    loadCamps();
+  </script>
+</body>
+</html>

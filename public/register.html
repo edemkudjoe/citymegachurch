@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:80px;">
+    <div class="container" style="max-width:480px;">
+      <div class="text-center mb-32">
+        <span class="eyebrow">Join the Family</span>
+        <h1 style="font-size:2.2rem; margin-top:12px;">Create an Account</h1>
+      </div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="full_name">Full Name</label>
+          <input type="text" id="full_name" required autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" autocomplete="tel" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender">
+              <option value="">Select</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="date_of_birth">Date of Birth</label>
+            <input type="date" id="date_of_birth" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required minlength="8" autocomplete="new-password" />
+          <div class="form-hint">At least 8 characters.</div>
+        </div>
+        <div class="form-error" id="formError"></div>
+        <button type="submit" class="btn btn-primary btn-block mt-32" id="submitBtn">Create Account</button>
+      </form>
+
+      <p class="text-center mt-32">
+        Already have an account? <a href="/login.html" style="color:var(--accent-light);">Log in</a>
+      </p>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('formError');
+      const btn = document.getElementById('submitBtn');
+      errorEl.classList.remove('visible');
+
+      const body = {
+        full_name: document.getElementById('full_name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        gender: document.getElementById('gender').value || null,
+        date_of_birth: document.getElementById('date_of_birth').value || null,
+        password: document.getElementById('password').value,
+      };
+
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+
+      try {
+        const { token, user } = await api('/auth/register', { method: 'POST', body });
+        setToken(token);
+        setStoredUser(user);
+        window.location.href = '/dashboard.html';
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.add('visible');
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    });
+  </script>
+</body>
+</html>

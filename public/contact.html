@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:48px;">
+    <div class="container section-head">
+      <span class="eyebrow">We'd Love to Meet You</span>
+      <h1>Plan Your Visit</h1>
+      <p>Reach out, or drop by — we'd love to have you.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container grid grid-2" style="gap:64px;">
+      <div>
+        <h3>Get in Touch</h3>
+        <div class="mt-32" id="contactDetails">
+          <div class="loading-spinner"></div>
+        </div>
+        <div class="social-links mt-32" id="socialLinks"></div>
+      </div>
+      <div id="mapContainer" style="border-radius:16px; overflow:hidden; min-height:360px; background:var(--bg-raised);"></div>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    api('/church-info').then(info => {
+      const details = document.getElementById('contactDetails');
+      details.innerHTML = `
+        ${info.address ? `<p style="margin-bottom:16px;"><strong style="color:var(--fg);">Address</strong><br/>${info.address}</p>` : ''}
+        ${info.phone ? `<p style="margin-bottom:16px;"><strong style="color:var(--fg);">Phone</strong><br/><a href="tel:${info.phone}">${info.phone}</a></p>` : ''}
+        ${info.email ? `<p style="margin-bottom:16px;"><strong style="color:var(--fg);">Email</strong><br/><a href="mailto:${info.email}">${info.email}</a></p>` : ''}
+      `;
+      if (!info.address && !info.phone && !info.email) {
+        details.innerHTML = '<p>Contact details coming soon.</p>';
+      }
+
+      const socials = document.getElementById('socialLinks');
+      const socialMap = [
+        { key: 'facebook_url', label: 'Facebook' },
+        { key: 'instagram_url', label: 'Instagram' },
+        { key: 'twitter_url', label: 'X' },
+        { key: 'youtube_url', label: 'YouTube' },
+        { key: 'tiktok_url', label: 'TikTok' },
+      ];
+      socials.innerHTML = socialMap
+        .filter(s => info[s.key])
+        .map(s => `<a href="${info[s.key]}" target="_blank" rel="noopener" title="${s.label}">${s.label[0]}</a>`)
+        .join('');
+
+      const mapContainer = document.getElementById('mapContainer');
+      if (info.google_maps_embed_url) {
+        mapContainer.innerHTML = `<iframe src="${info.google_maps_embed_url}" width="100%" height="100%" style="border:0; min-height:360px;" allowfullscreen loading="lazy"></iframe>`;
+      } else {
+        mapContainer.innerHTML = '<div class="empty-state" style="height:100%; display:flex; align-items:center; justify-content:center;">Map coming soon.</div>';
+      }
+    }).catch(() => {
+      document.getElementById('contactDetails').innerHTML = '<p>Unable to load contact details.</p>';
+    });
+  </script>
+</body>
+</html>

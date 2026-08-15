@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Camps — City Mega Church Admin</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/admin/css/admin.css" />
+</head>
+<body>
+
+  <div class="admin-page-head">
+    <div>
+      <h1>Prayer Camps</h1>
+      <p>Create camps, set capacity, and open or close registration.</p>
+    </div>
+    <button class="btn btn-primary" id="newCampBtn">+ New Camp</button>
+  </div>
+
+  <div class="admin-table-wrap">
+    <div class="admin-table-scroll">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Dates</th>
+            <th>Venue</th>
+            <th>Spaces</th>
+            <th>Registration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="campsBody">
+          <tr><td colspan="6" style="text-align:center; padding:40px;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Create/Edit Modal -->
+  <div class="modal-overlay" id="campModal">
+    <div class="modal-box">
+      <h3 id="campModalTitle">New Camp</h3>
+      <form id="campForm">
+        <input type="hidden" id="campId" />
+        <div class="form-group">
+          <label for="campName">Camp Name</label>
+          <input type="text" id="campName" required />
+        </div>
+        <div class="form-group">
+          <label for="campDescription">Description</label>
+          <textarea id="campDescription" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="campStartDate">Start Date</label>
+            <input type="date" id="campStartDate" required />
+          </div>
+          <div class="form-group">
+            <label for="campEndDate">End Date</label>
+            <input type="date" id="campEndDate" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="campVenue">Venue</label>
+            <input type="text" id="campVenue" />
+          </div>
+          <div class="form-group">
+            <label for="campMaxParticipants">Max Participants</label>
+            <input type="number" id="campMaxParticipants" min="1" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="campCoverImage">Cover Image</label>
+          <div class="upload-zone" id="campUploadZone">
+            <span class="upload-zone-label">Click to upload a cover image</span>
+          </div>
+          <img id="campCoverPreview" class="upload-preview" style="display:none;" />
+          <input type="hidden" id="campCoverImageUrl" />
+        </div>
+        <div class="form-group" style="display:flex; align-items:center; gap:10px; margin-top:20px;">
+          <input type="checkbox" id="campRegOpen" style="width:auto;" checked />
+          <label for="campRegOpen" style="margin:0;">Registration Open</label>
+        </div>
+        <div class="form-error" id="campError"></div>
+        <div class="modal-close-row">
+          <button type="button" class="btn btn-outline" id="closeCampModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveCampBtn">Save Camp</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/admin/js/admin-layout.js"></script>
+  <script src="/admin/js/upload-helper.js"></script>
+  <script>
+    let camps = [];
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function renderCamps() {
+      const body = document.getElementById('campsBody');
+      if (!camps.length) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--fg-dim);">No camps yet. Create your first one.</td></tr>';
+        return;
+      }
+      body.innerHTML = camps.map(c => `
+        <tr>
+          <td>${escapeHtml(c.name)}</td>
+          <td>${formatDate(c.start_date)} &ndash; ${formatDate(c.end_date)}</td>
+          <td>${escapeHtml(c.venue || '—')}</td>
+          <td>${c.available_spaces} / ${c.max_participants}</td>
+          <td>
+            <span class="bool-dot ${c.registration_open ? 'on' : 'off'}"></span>
+            ${c.registration_open ? 'Open' : 'Closed'}
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="icon-btn" data-action="toggle" data-id="${c.id}">${c.registration_open ? 'Close' : 'Open'} Reg.</button>
+              <button class="icon-btn" data-action="edit" data-id="${c.id}">Edit</button>
+              <button class="icon-btn danger" data-action="delete" data-id="${c.id}">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      body.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.id));
+      });
+    }
+
+    async function loadCamps() {
+      try {
+        camps = await api('/camps');
+        renderCamps();
+      } catch (err) {
+        document.getElementById('campsBody').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px;">Unable to load camps: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    async function handleAction(action, id) {
+      const camp = camps.find(c => c.id === id);
+      if (!camp) return;
+
+      if (action === 'toggle') {
+        try {
+          await api(`/camps?id=${id}`, { method: 'PUT', auth: true, body: { registration_open: !camp.registration_open } });
+          showToast(`Registration ${!camp.registration_open ? 'opened' : 'closed'}.`);
+          loadCamps();
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+        return;
+      }
+
+      if (action === 'delete') {
+        if (!confirm(`Delete "${camp.name}"? This will also delete all its bookings. This can't be undone.`)) return;
+        try {
+          await api(`/camps?id=${id}`, { method: 'DELETE', auth: true });
+          showToast('Camp deleted.');
+          loadCamps();
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+        return;
+      }
+
+      if (action === 'edit') {
+        openCampModal(camp);
+      }
+    }
+
+    function resetCampForm() {
+      document.getElementById('campId').value = '';
+      document.getElementById('campName').value = '';
+      document.getElementById('campDescription').value = '';
+      document.getElementById('campStartDate').value = '';
+      document.getElementById('campEndDate').value = '';
+      document.getElementById('campVenue').value = '';
+      document.getElementById('campMaxParticipants').value = '100';
+      document.getElementById('campCoverImageUrl').value = '';
+      document.getElementById('campCoverPreview').style.display = 'none';
+      document.getElementById('campRegOpen').checked = true;
+      document.getElementById('campError').classList.remove('visible');
+    }
+
+    function openCampModal(camp) {
+      resetCampForm();
+      document.getElementById('campModalTitle').textContent = camp ? 'Edit Camp' : 'New Camp';
+      if (camp) {
+        document.getElementById('campId').value = camp.id;
+        document.getElementById('campName').value = camp.name;
+        document.getElementById('campDescription').value = camp.description || '';
+        document.getElementById('campStartDate').value = camp.start_date;
+        document.getElementById('campEndDate').value = camp.end_date;
+        document.getElementById('campVenue').value = camp.venue || '';
+        document.getElementById('campMaxParticipants').value = camp.max_participants;
+        document.getElementById('campRegOpen').checked = camp.registration_open;
+        if (camp.cover_image_url) {
+          document.getElementById('campCoverImageUrl').value = camp.cover_image_url;
+          document.getElementById('campCoverPreview').src = camp.cover_image_url;
+          document.getElementById('campCoverPreview').style.display = 'block';
+        }
+      }
+      document.getElementById('campModal').classList.add('open');
+    }
+
+    document.getElementById('newCampBtn').addEventListener('click', () => openCampModal(null));
+    document.getElementById('closeCampModal').addEventListener('click', () => {
+      document.getElementById('campModal').classList.remove('open');
+    });
+
+    initUploadZone(
+      document.getElementById('campUploadZone'),
+      'church-assets',
+      (url) => document.getElementById('campCoverImageUrl').value = url,
+      document.getElementById('campCoverPreview')
+    );
+
+    document.getElementById('campForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('campId').value;
+      const errorEl = document.getElementById('campError');
+      const btn = document.getElementById('saveCampBtn');
+      errorEl.classList.remove('visible');
+
+      const body = {
+        name: document.getElementById('campName').value.trim(),
+        description: document.getElementById('campDescription').value.trim() || null,
+        start_date: document.getElementById('campStartDate').value,
+        end_date: document.getElementById('campEndDate').value,
+        venue: document.getElementById('campVenue').value.trim() || null,
+        max_participants: parseInt(document.getElementById('campMaxParticipants').value, 10),
+        cover_image_url: document.getElementById('campCoverImageUrl').value || null,
+        registration_open: document.getElementById('campRegOpen').checked,
+      };
+
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        if (id) {
+          await api(`/camps?id=${id}`, { method: 'PUT', auth: true, body });
+        } else {
+          await api('/camps', { method: 'POST', auth: true, body });
+        }
+        document.getElementById('campModal').classList.remove('open');
+        showToast('Camp saved.');
+        loadCamps();
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Camp';
+      }
+    });
+
+    loadCamps();
+  </script>
+</body>
+</html>

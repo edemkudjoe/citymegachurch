@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>City Mega Church</title>
+  <meta name="description" content="City Mega Church — a home for building lives and transforming cities. Join us for worship, community, and prayer camps." />
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-bg">
+      <img id="heroImage" src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1600&q=80" alt="" />
+    </div>
+    <svg class="hero-skyline-grid" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path d="M0,800 L0,600 L100,600 L100,500 L220,500 L220,540 L340,540 L340,420 L380,420 L380,380 L420,380 L420,420 L460,420 L460,560 L600,560 L600,480 L640,480 L640,440 L680,440 L680,480 L720,480 L720,600 L860,600 L860,520 L940,520 L940,580 L1060,580 L1060,460 L1100,460 L1100,420 L1140,420 L1140,460 L1180,460 L1180,600 L1200,600 L1200,800 Z"
+        fill="none" stroke="#7C3AED" stroke-width="1" opacity="0.25"/>
+    </svg>
+    <div class="container hero-content">
+      <span class="eyebrow">Welcome Home</span>
+      <h1 id="heroWelcome">A City Built on Faith.<br/>A Church Built for You.</h1>
+      <p id="heroTagline">City Mega Church is a community where lives are built and cities are transformed — through worship, the Word, and radical prayer.</p>
+      <div class="hero-actions">
+        <a href="/book-camp.html" class="btn btn-primary">Book Prayer Camp</a>
+        <a href="/contact.html" class="btn btn-outline">Plan a Visit</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div id="skylineTop"></div></div>
+
+  <section id="about-preview">
+    <div class="container">
+      <div class="grid grid-2" style="align-items:center; gap:64px;">
+        <div>
+          <span class="eyebrow">Who We Are</span>
+          <h2 class="mt-32">More than a service.<br/>A family in the city.</h2>
+          <p class="mt-32" id="welcomeMessage">
+            We're a community of believers committed to raising a generation that knows God deeply
+            and lives boldly. Whatever season you're in, there's a seat for you here.
+          </p>
+          <a href="/about.html" class="btn btn-outline mt-32">Learn Our Story</a>
+        </div>
+        <div>
+          <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=800&q=80" alt="Congregation gathered in worship" style="border-radius:16px; aspect-ratio:4/5; object-fit:cover;" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services-preview" style="background:var(--bg-raised);">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Join Us</span>
+        <h2>Service Times</h2>
+        <p>Come as you are. Every week, we gather to worship, grow, and connect.</p>
+      </div>
+      <div class="grid grid-3" id="servicesGrid">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="events-preview">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">What's Coming Up</span>
+        <h2>Upcoming Events</h2>
+      </div>
+      <div class="grid grid-3" id="eventsGrid">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="camp-cta" style="background:linear-gradient(135deg, var(--accent-deep), var(--bg)); border-radius:24px; margin:0 24px; max-width:1152px; margin-inline:auto;">
+    <div class="container text-center">
+      <span class="eyebrow">Prayer Camp</span>
+      <h2 class="mt-32">Step away. Seek God. Come back changed.</h2>
+      <p class="mt-32" style="max-width:560px; margin-inline:auto;">
+        Our prayer camps are set apart moments for encounter — days of prayer, fasting, and
+        community built to reset your walk with God.
+      </p>
+      <a href="/book-camp.html" class="btn btn-primary mt-32">Book Your Spot</a>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    // Load dynamic church info for hero
+    api('/church-info').then(info => {
+      if (info.hero_image_url) document.getElementById('heroImage').src = info.hero_image_url;
+      if (info.welcome_message) document.getElementById('welcomeMessage').textContent = info.welcome_message;
+      if (info.slogan) document.getElementById('heroTagline').textContent = info.slogan;
+    }).catch(() => {});
+
+    // Load services preview (first 3)
+    api('/content?type=services').then(services => {
+      const grid = document.getElementById('servicesGrid');
+      if (!services.length) {
+        grid.innerHTML = '<div class="empty-state">Service times coming soon.</div>';
+        return;
+      }
+      grid.innerHTML = services.slice(0, 3).map(s => `
+        <div class="card">
+          <div class="card-body">
+            <div class="card-meta">${s.day_of_week} · ${s.time}</div>
+            <h3>${s.name}</h3>
+            <p>${s.description || s.venue || ''}</p>
+          </div>
+        </div>
+      `).join('');
+    }).catch(() => {
+      document.getElementById('servicesGrid').innerHTML = '<div class="empty-state">Unable to load service times.</div>';
+    });
+
+    // Load upcoming events (first 3)
+    api('/content?type=events').then(events => {
+      const grid = document.getElementById('eventsGrid');
+      const upcoming = events.filter(e => new Date(e.event_date) >= new Date().setHours(0,0,0,0)).slice(0, 3);
+      if (!upcoming.length) {
+        grid.innerHTML = '<div class="empty-state">No upcoming events right now — check back soon.</div>';
+        return;
+      }
+      grid.innerHTML = upcoming.map(e => `
+        <div class="card">
+          ${e.image_url ? `<img src="${e.image_url}" alt="${e.title}" />` : ''}
+          <div class="card-body">
+            <div class="card-meta">${formatDate(e.event_date)}${e.event_time ? ' · ' + e.event_time : ''}</div>
+            <h3>${e.title}</h3>
+            <p>${e.description || ''}</p>
+          </div>
+        </div>
+      `).join('');
+    }).catch(() => {
+      document.getElementById('eventsGrid').innerHTML = '<div class="empty-state">Unable to load events.</div>';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .gallery-grid img { width: 100%; height: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; cursor: pointer; transition: opacity 0.15s ease; }
+    .gallery-grid img:hover { opacity: 0.8; }
+    @media (max-width: 900px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+    .tag-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+    .tag-pill {
+      padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border-strong);
+      font-size: 0.85rem; cursor: pointer; background: transparent; color: var(--fg-muted);
+      font-family: var(--font-display);
+    }
+    .tag-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:48px;">
+    <div class="container section-head">
+      <span class="eyebrow">Moments</span>
+      <h1>Gallery</h1>
+      <p>A look into life at City Mega Church.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container">
+      <div class="tag-filters" id="tagFilters"></div>
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">&times;</button>
+    <img id="lightboxImg" src="" alt="" />
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    let allImages = [];
+
+    function renderGallery(images) {
+      const grid = document.getElementById('galleryGrid');
+      if (!images.length) {
+        grid.innerHTML = '<div class="empty-state">No photos yet — check back soon.</div>';
+        return;
+      }
+      grid.innerHTML = images.map(img => `
+        <img src="${img.image_url}" alt="${img.caption || 'Gallery photo'}" data-full="${img.image_url}" />
+      `).join('');
+
+      grid.querySelectorAll('img').forEach(el => {
+        el.addEventListener('click', () => {
+          document.getElementById('lightboxImg').src = el.dataset.full;
+          document.getElementById('lightbox').classList.add('open');
+        });
+      });
+    }
+
+    function renderTags(images) {
+      const tags = new Set();
+      images.forEach(img => (img.tags || []).forEach(t => tags.add(t)));
+      const filterBar = document.getElementById('tagFilters');
+      if (!tags.size) { filterBar.style.display = 'none'; return; }
+
+      const allPill = `<button class="tag-pill active" data-tag="">All</button>`;
+      const tagPills = Array.from(tags).map(t => `<button class="tag-pill" data-tag="${t}">${t}</button>`).join('');
+      filterBar.innerHTML = allPill + tagPills;
+
+      filterBar.querySelectorAll('.tag-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBar.querySelectorAll('.tag-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const tag = btn.dataset.tag;
+          renderGallery(tag ? allImages.filter(img => (img.tags || []).includes(tag)) : allImages);
+        });
+      });
+    }
+
+    api('/gallery').then(images => {
+      allImages = images;
+      renderTags(images);
+      renderGallery(images);
+    }).catch(() => {
+      document.getElementById('galleryGrid').innerHTML = '<div class="empty-state">Unable to load gallery.</div>';
+    });
+
+    document.getElementById('lightboxClose').addEventListener('click', () => {
+      document.getElementById('lightbox').classList.remove('open');
+    });
+    document.getElementById('lightbox').addEventListener('click', (e) => {
+      if (e.target.id === 'lightbox') document.getElementById('lightbox').classList.remove('open');
+    });
+  </script>
+</body>
+</html>
