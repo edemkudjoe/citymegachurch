@@ -9,9 +9,9 @@ const NAV_LINKS = [
   { href: '/ministries.html', label: 'Ministries' },
   { href: '/events.html', label: 'Events' },
   { href: '/sermons.html', label: 'Sermons' },
+  { href: '/articles.html', label: 'Articles' },
   { href: '/gallery.html', label: 'Gallery' },
   { href: '/contact.html', label: 'Contact' },
-  { href: '/articles.html', label: 'Articles' },
 ];
 
 function renderHeader() {
