@@ -153,12 +153,12 @@
 
       body.innerHTML = filtered.map(b => `
         <tr>
-          <td>${escapeHtml(b.booking_ref)}</td>
-          <td>${escapeHtml(b.full_name)}</td>
-          <td>${escapeHtml(b.prayer_camps ? b.prayer_camps.name : '—')}</td>
-          <td>${escapeHtml(b.phone_number)}<br/><span style="color:var(--fg-dim); font-size:0.82rem;">${escapeHtml(b.email)}</span></td>
-          <td><span class="badge ${badgeClass[b.status]}">${escapeHtml(b.status)}</span></td>
-          <td>
+          <td data-label="Reference">${escapeHtml(b.booking_ref)}</td>
+          <td data-label="Name">${escapeHtml(b.full_name)}</td>
+          <td data-label="Camp">${escapeHtml(b.prayer_camps ? b.prayer_camps.name : '—')}</td>
+          <td data-label="Contact">${escapeHtml(b.phone_number)}<br/><span style="color:var(--fg-dim); font-size:0.82rem;">${escapeHtml(b.email)}</span></td>
+          <td data-label="Status"><span class="badge ${badgeClass[b.status]}">${escapeHtml(b.status)}</span></td>
+          <td data-label="Actions" class="actions-cell">
             <div class="table-actions">
               ${b.status !== 'Approved' ? `<button class="icon-btn" data-action="approve" data-id="${b.id}">Approve</button>` : ''}
               ${b.status !== 'Declined' ? `<button class="icon-btn" data-action="decline" data-id="${b.id}">Decline</button>` : ''}
@@ -168,7 +168,7 @@
           </td>
         </tr>
       `).join('');
-
+      
       body.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.id));
       });
