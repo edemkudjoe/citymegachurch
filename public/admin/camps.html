@@ -112,15 +112,15 @@
       }
       body.innerHTML = camps.map(c => `
         <tr>
-          <td>${escapeHtml(c.name)}</td>
-          <td>${formatDate(c.start_date)} &ndash; ${formatDate(c.end_date)}</td>
-          <td>${escapeHtml(c.venue || '—')}</td>
-          <td>${c.available_spaces} / ${c.max_participants}</td>
-          <td>
+          <td data-label="Name">${escapeHtml(c.name)}</td>
+          <td data-label="Dates">${formatDate(c.start_date)} &ndash; ${formatDate(c.end_date)}</td>
+          <td data-label="Venue">${escapeHtml(c.venue || '—')}</td>
+          <td data-label="Spaces">${c.available_spaces} / ${c.max_participants}</td>
+          <td data-label="Registration">
             <span class="bool-dot ${c.registration_open ? 'on' : 'off'}"></span>
             ${c.registration_open ? 'Open' : 'Closed'}
           </td>
-          <td>
+          <td data-label="Actions" class="actions-cell">
             <div class="table-actions">
               <button class="icon-btn" data-action="toggle" data-id="${c.id}">${c.registration_open ? 'Close' : 'Open'} Reg.</button>
               <button class="icon-btn" data-action="edit" data-id="${c.id}">Edit</button>
