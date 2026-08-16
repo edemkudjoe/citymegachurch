@@ -47,7 +47,7 @@
           <div class="card-body">
             <div class="card-meta">${s.sermon_date ? formatDate(s.sermon_date) : ''}${s.speaker ? ' · ' + s.speaker : ''}</div>
             <h3>${s.title}</h3>
-            <p>${s.description || ''}</p>
+            <p class="preserve-lines">${s.description || ''}</p>
             <div style="display:flex; gap:12px; margin-top:16px;">
               ${s.youtube_url ? `<a href="${s.youtube_url}" target="_blank" rel="noopener" class="btn btn-outline" style="padding:10px 18px; font-size:0.85rem;">Watch</a>` : ''}
               ${s.audio_url ? `<a href="${s.audio_url}" target="_blank" rel="noopener" class="btn btn-outline" style="padding:10px 18px; font-size:0.85rem;">Listen</a>` : ''}
