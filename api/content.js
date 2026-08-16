@@ -22,7 +22,7 @@ const TABLE_CONFIG = {
     table: 'services',
     publicFilter: { column: 'is_active', value: true },
     orderBy: { column: 'display_order', ascending: true },
-    allowedFields: ['name', 'day_of_week', 'time', 'venue', 'description', 'display_order', 'is_active'],
+    allowedFields: ['name', 'day_of_week', 'time', 'venue', 'description', 'image_url', 'display_order', 'is_active'],
   },
   ministries: {
     table: 'ministries',
