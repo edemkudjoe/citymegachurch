@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: '/sermons.html', label: 'Sermons' },
   { href: '/gallery.html', label: 'Gallery' },
   { href: '/contact.html', label: 'Contact' },
+  { href: '/articles.html', label: 'Articles' },
 ];
 
 function renderHeader() {
