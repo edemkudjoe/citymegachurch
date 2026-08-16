@@ -387,6 +387,12 @@ section { padding: 96px 0; }
 .text-center { text-align: center; }
 .mt-32 { margin-top: 32px; }
 .mb-32 { margin-bottom: 32px; }
+
+/* Preserves line breaks typed in admin textareas (history, bios, sermon
+   notes, article content, etc.) — browsers collapse plain newlines by
+   default, so anywhere multi-line admin-authored text is displayed needs
+   this class or it renders as one clustered paragraph. */
+.preserve-lines { white-space: pre-line; }
 .empty-state {
   text-align: center;
   padding: 48px 24px;
