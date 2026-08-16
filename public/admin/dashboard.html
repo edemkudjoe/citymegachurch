@@ -65,9 +65,9 @@
       } else {
         campsBody.innerHTML = stats.upcoming_camps.map(c => `
           <tr>
-            <td>${escapeHtml(c.name)}</td>
-            <td>${formatDate(c.start_date)} &ndash; ${formatDate(c.end_date)}</td>
-            <td>${c.available_spaces} / ${c.max_participants} left</td>
+            <td data-label="Camp">${escapeHtml(c.name)}</td>
+            <td data-label="Dates">${formatDate(c.start_date)} &ndash; ${formatDate(c.end_date)}</td>
+            <td data-label="Spaces">${c.available_spaces} / ${c.max_participants} left</td>
           </tr>
         `).join('');
       }
@@ -78,9 +78,9 @@
       } else {
         bookingsBody.innerHTML = stats.recent_bookings.map(b => `
           <tr>
-            <td>${escapeHtml(b.full_name)}</td>
-            <td>${escapeHtml(b.prayer_camps ? b.prayer_camps.name : '—')}</td>
-            <td><span class="badge ${badgeClass[b.status]}">${escapeHtml(b.status)}</span></td>
+            <td data-label="Name">${escapeHtml(b.full_name)}</td>
+            <td data-label="Camp">${escapeHtml(b.prayer_camps ? b.prayer_camps.name : '—')}</td>
+            <td data-label="Status"><span class="badge ${badgeClass[b.status]}">${escapeHtml(b.status)}</span></td>
           </tr>
         `).join('');
       }
