@@ -40,7 +40,7 @@
             <div class="card-meta">${formatDate(e.event_date)}${e.event_time ? ' · ' + e.event_time : ''}</div>
             <h3>${e.title}</h3>
             ${e.venue ? `<p style="margin-bottom:8px;"><strong style="color:var(--fg);">Venue:</strong> ${e.venue}</p>` : ''}
-            <p>${e.description || ''}</p>
+            <p class="preserve-lines">${e.description || ''}</p>
           </div>
         </div>
       `).join('');
