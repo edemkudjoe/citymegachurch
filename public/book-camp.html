@@ -185,7 +185,7 @@
             <h3 class="mt-32">${escapeHtml(c.name)}</h3>
             <div class="card-meta">${formatDate(c.start_date)} &ndash; ${formatDate(c.end_date)}</div>
             ${c.venue ? `<p style="margin-bottom:8px;"><strong style="color:var(--fg);">Venue:</strong> ${escapeHtml(c.venue)}</p>` : ''}
-            <p>${escapeHtml(c.description || '')}</p>
+            <p class="preserve-lines">${escapeHtml(c.description || '')}</p>
           </div>
         </div>
       `}).join('');
