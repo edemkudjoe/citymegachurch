@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Article — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    .article-body { max-width: 720px; margin: 0 auto; }
+    .article-cover { width: 100%; border-radius: 16px; aspect-ratio: 16/9; object-fit: cover; margin-bottom: 40px; }
+    .article-content { font-size: 1.05rem; line-height: 1.8; color: var(--fg); }
+    .article-content p { color: inherit; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:80px;">
+    <div class="container article-body" id="articleContainer">
+      <div class="loading-spinner"></div>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug');
+    const container = document.getElementById('articleContainer');
+
+    if (!slug) {
+      container.innerHTML = '<div class="empty-state">No article specified.</div>';
+    } else {
+      api('/content?type=articles').then(articles => {
+        const article = articles.find(a => a.slug === slug);
+        if (!article) {
+          container.innerHTML = '<div class="empty-state">Article not found.</div>';
+          return;
+        }
+        document.title = `${article.title} — City Mega Church`;
+        container.innerHTML = `
+          <a href="/articles.html" style="color:var(--accent-light); font-size:0.9rem;">&larr; Back to Articles</a>
+          <div class="eyebrow mt-32">${formatDate(article.created_at)}${article.author_name ? ' · ' + escapeHtml(article.author_name) : ''}</div>
+          <h1 class="mt-32" style="margin-bottom:32px;">${escapeHtml(article.title)}</h1>
+          ${article.cover_image_url ? `<img src="${escapeHtml(article.cover_image_url)}" alt="${escapeHtml(article.title)}" class="article-cover" />` : ''}
+          <div class="article-content preserve-lines">${escapeHtml(article.content)}</div>
+        `;
+      }).catch(() => {
+        container.innerHTML = '<div class="empty-state">Unable to load this article.</div>';
+      });
+    }
+  </script>
+</body>
+</html>
