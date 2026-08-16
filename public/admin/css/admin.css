@@ -157,6 +157,56 @@ table.admin-table td {
 table.admin-table tr:hover td { background: rgba(255,255,255,0.02); }
 .admin-table-scroll { overflow-x: auto; }
 
+
+@media (max-width: 700px) {
+  .admin-table-scroll { overflow-x: visible; }
+  table.admin-table thead { display: none; }
+  table.admin-table, table.admin-table tbody, table.admin-table tr, table.admin-table td {
+    display: block;
+    width: 100%;
+  }
+  table.admin-table tr {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+  table.admin-table tr:first-child { border-top: none; }
+  table.admin-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 7px 0;
+    border-top: none;
+    text-align: right;
+  }
+  table.admin-table td::before {
+    content: attr(data-label);
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--fg-dim);
+    font-weight: 600;
+    text-align: left;
+    flex-shrink: 0;
+  }
+  table.admin-table td.actions-cell {
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 14px;
+  }
+  table.admin-table td.actions-cell::before {
+    margin-bottom: 10px;
+  }
+  table.admin-table td.actions-cell .table-actions {
+    justify-content: stretch;
+  }
+  table.admin-table td.actions-cell .table-actions .icon-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
 .icon-btn {
   background: none;
   border: 1px solid var(--border-strong);
