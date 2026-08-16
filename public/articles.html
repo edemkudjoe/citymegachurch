@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Articles — City Mega Church</title>
+  <link rel="icon" href="/images/logo.png" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+  <section style="padding-top:160px; padding-bottom:48px;">
+    <div class="container section-head">
+      <span class="eyebrow">Read</span>
+      <h1>Articles</h1>
+      <p>Reflections, updates, and stories from City Mega Church.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0;">
+    <div class="container grid grid-3" id="articlesGrid">
+      <div class="loading-spinner"></div>
+    </div>
+  </section>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function excerpt(text, maxLen = 140) {
+      if (!text) return '';
+      const clean = text.replace(/\s+/g, ' ').trim();
+      return clean.length > maxLen ? clean.slice(0, maxLen).trim() + '…' : clean;
+    }
+
+    api('/content?type=articles').then(articles => {
+      const grid = document.getElementById('articlesGrid');
+      if (!articles.length) {
+        grid.innerHTML = '<div class="empty-state">No articles published yet — check back soon.</div>';
+        return;
+      }
+      grid.innerHTML = articles.map(a => `
+        <a href="/article.html?slug=${encodeURIComponent(a.slug)}" class="card">
+          ${a.cover_image_url ? `<img src="${escapeHtml(a.cover_image_url)}" alt="${escapeHtml(a.title)}" />` : ''}
+          <div class="card-body">
+            <div class="card-meta">${formatDate(a.created_at)}${a.author_name ? ' · ' + escapeHtml(a.author_name) : ''}</div>
+            <h3>${escapeHtml(a.title)}</h3>
+            <p>${escapeHtml(excerpt(a.content))}</p>
+          </div>
+        </a>
+      `).join('');
+    }).catch(() => {
+      document.getElementById('articlesGrid').innerHTML = '<div class="empty-state">Unable to load articles.</div>';
+    });
+  </script>
+</body>
+</html>
