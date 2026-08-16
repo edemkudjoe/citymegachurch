@@ -38,7 +38,7 @@
           <div class="card-body">
             <h3>${m.name}</h3>
             ${m.leader_name ? `<div class="card-meta">Led by ${m.leader_name}</div>` : ''}
-            <p>${m.description || ''}</p>
+            <p class="preserve-lines">${m.description || ''}</p>
           </div>
         </div>
       `).join('');
