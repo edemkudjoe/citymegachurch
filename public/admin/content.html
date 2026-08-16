@@ -331,6 +331,7 @@
     const CONTENT_TYPES = {
       services: {
         columns: ['name', 'day_of_week', 'time', 'venue', 'is_active'],
+        columnLabels: { name: 'Name', day_of_week: 'Day', time: 'Time', venue: 'Venue', is_active: 'Active' },
         fields: [
           { key: 'name', label: 'Service Name', type: 'text', required: true },
           { key: 'day_of_week', label: 'Day of Week', type: 'select', options: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], required: true },
@@ -344,6 +345,7 @@
       },
       ministries: {
         columns: ['name', 'leader_name', 'is_active'],
+        columnLabels: { name: 'Name', leader_name: 'Leader', is_active: 'Active' },
         fields: [
           { key: 'name', label: 'Ministry Name', type: 'text', required: true },
           { key: 'leader_name', label: 'Leader Name', type: 'text' },
@@ -355,6 +357,7 @@
       },
       events: {
         columns: ['title', 'event_date', 'venue', 'is_published'],
+        columnLabels: { title: 'Title', event_date: 'Date', venue: 'Venue', is_published: 'Published' },
         fields: [
           { key: 'title', label: 'Event Title', type: 'text', required: true },
           { key: 'event_date', label: 'Date', type: 'date', required: true },
@@ -367,6 +370,7 @@
       },
       sermons: {
         columns: ['title', 'speaker', 'sermon_date', 'is_published'],
+        columnLabels: { title: 'Title', speaker: 'Speaker', sermon_date: 'Date', is_published: 'Published' },
         fields: [
           { key: 'title', label: 'Sermon Title', type: 'text', required: true },
           { key: 'speaker', label: 'Speaker', type: 'text' },
@@ -381,6 +385,7 @@
       },
       articles: {
         columns: ['title', 'author_name', 'is_published'],
+        columnLabels: { title: 'Title', author_name: 'Author', is_published: 'Published' },
         fields: [
           { key: 'title', label: 'Title', type: 'text', required: true },
           { key: 'author_name', label: 'Author', type: 'text' },
@@ -423,8 +428,8 @@
       }
       body.innerHTML = items.map(item => `
         <tr>
-          ${config.columns.map(col => `<td>${formatCellValue(item, col)}</td>`).join('')}
-          <td>
+          ${config.columns.map(col => `<td data-label="${config.columnLabels[col]}">${formatCellValue(item, col)}</td>`).join('')}
+          <td data-label="Actions" class="actions-cell">
             <div class="table-actions">
               <button class="icon-btn" data-edit="${type}" data-id="${item.id}">Edit</button>
               <button class="icon-btn danger" data-delete="${type}" data-id="${item.id}">Delete</button>
