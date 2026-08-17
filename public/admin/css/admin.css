@@ -342,3 +342,16 @@ table.admin-table tr:hover td { background: rgba(255,255,255,0.02); }
 .bool-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
 .bool-dot.on { background: var(--success); }
 .bool-dot.off { background: var(--fg-dim); }
+
+.remove-upload-link {
+  display: inline-block;
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 8px;
+  padding: 0;
+  font-family: var(--font-body);
+}
+.remove-upload-link:hover { text-decoration: underline; }
