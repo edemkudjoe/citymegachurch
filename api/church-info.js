@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
     const allowedFields = [
       'church_name', 'slogan', 'hero_image_url', 'hero_video_url', 'welcome_message',
       'history', 'vision', 'mission', 'core_values', 'lead_pastor_name',
-      'lead_pastor_bio', 'lead_pastor_image_url', 'address', 'phone', 'email',
+      'lead_pastor_bio', 'lead_pastor_image_url', 'about_preview_image_url', 'address', 'phone', 'email',
       'google_maps_embed_url', 'facebook_url', 'instagram_url', 'twitter_url',
       'youtube_url', 'tiktok_url',
     ];
