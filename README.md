@@ -85,7 +85,7 @@ There's no client-side router — every page is a real, separate `.html` file.
    npm install
    ```
 2. **Create a Supabase project** at [supabase.com](https://supabase.com).
-3. **Run the schema**: open the Supabase SQL Editor and run the entire contents of `schema.sql` once. This creates all tables, triggers, the `camp_availability` view, and Row Level Security policies.
+3. **Run the schema**: open the Supabase SQL Editor and run the entire contents of `schema.sql`. This creates all tables, triggers, the `camp_availability` view, and Row Level Security policies. The file is safe to re-run later after a pull — table-creation statements are skipped if the tables already exist, and any `alter table ... add column if not exists` statements at the bottom will backfill new columns onto your existing database without touching your data.
 4. **Create Storage buckets** in Supabase named: `gallery`, `sermons`, `events`, `articles`, `church-assets` — make each **public** (read access) so uploaded images/files can be displayed on the site.
 5. **Set environment variables** (see [Environment Variables](#environment-variables) below) — locally in a `.env` file for `vercel dev`, and in the Vercel dashboard for production.
 6. **Run locally**:
