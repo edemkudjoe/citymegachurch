@@ -284,6 +284,7 @@ section { padding: 96px 0; }
   position: absolute;
   inset: 0;
   z-index: 0;
+  background: radial-gradient(ellipse at top, var(--bg-raised) 0%, var(--bg) 65%);
 }
 .hero-bg img, .hero-bg video {
   width: 100%;
