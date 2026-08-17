@@ -72,6 +72,7 @@ function initUploadZone(zoneEl, bucket, onUploaded, previewEl) {
   });
 }
 
+
 function addRemoveLink(afterEl, hiddenInputId, previewId, currentUrl) {
   const existing = afterEl.nextElementSibling;
   if (existing && existing.classList.contains('remove-upload-link')) {
