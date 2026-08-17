@@ -151,13 +151,14 @@ section { padding: 96px 0; }
 .nav-logo { height: 34px; }
 .nav-links {
   display: flex;
+  align-items: center;
   gap: 32px;
   list-style: none;
   font-size: 0.92rem;
   font-weight: 500;
 }
-.nav-links a { color: var(--fg-muted); transition: color 0.15s ease; }
-.nav-links a:hover, .nav-links a.active { color: var(--fg); }
+.nav-links > li > a { color: var(--fg-muted); transition: color 0.15s ease; }
+.nav-links > li > a:hover, .nav-links > li > a.active { color: var(--fg); }
 .nav-actions { display: flex; gap: 12px; align-items: center; }
 .nav-toggle {
   display: none;
@@ -167,12 +168,62 @@ section { padding: 96px 0; }
   font-size: 1.5rem;
   cursor: pointer;
 }
+
+/* ---------- Nav dropdown ("Explore") ---------- */
+.nav-dropdown { position: relative; }
+.nav-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--fg-muted);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+.nav-dropdown-trigger:hover, .nav-dropdown-trigger.active { color: var(--fg); }
+.nav-caret { font-size: 0.7rem; transition: transform 0.15s ease; }
+.nav-dropdown.open .nav-caret { transform: rotate(180deg); }
+
+.nav-dropdown-menu {
+  display: none;
+  list-style: none;
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-raised-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 8px;
+  min-width: 160px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+.nav-dropdown.open .nav-dropdown-menu { display: block; }
+.nav-dropdown-menu li a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: var(--fg-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.nav-dropdown-menu li a:hover, .nav-dropdown-menu li a.active {
+  background: var(--bg-raised);
+  color: var(--fg);
+}
+
 @media (max-width: 900px) {
   .nav-links { display: none; }
   .nav-toggle { display: block; }
   .nav-links.open {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     position: absolute;
     top: 100%;
     left: 0; right: 0;
@@ -181,7 +232,21 @@ section { padding: 96px 0; }
     border-bottom: 1px solid var(--border);
     gap: 20px;
   }
+  .nav-dropdown { width: 100%; }
+  .nav-dropdown-trigger { width: 100%; justify-content: space-between; }
+  .nav-dropdown-menu {
+    display: none;
+    position: static;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    background: none;
+    padding: 12px 0 0 12px;
+    min-width: 0;
+  }
+  .nav-dropdown.open .nav-dropdown-menu { display: flex; flex-direction: column; gap: 12px; }
 }
+
 
 /* ---------- Skyline divider (signature element) ---------- */
 .skyline-divider {
