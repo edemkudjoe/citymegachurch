@@ -52,7 +52,13 @@ function renderHeader() {
       <a href="/index.html" aria-label="City Mega Church home">
         <img src="/images/logo.png" alt="City Mega Church" class="nav-logo" />
       </a>
-      <ul class="nav-links" id="navLinks">${primaryLinks}${exploreDropdown}${contactLink}</ul>
+      <ul class="nav-links" id="navLinks">
+        ${primaryLinks}${exploreDropdown}${contactLink}
+        <li class="nav-mobile-actions">
+          ${accountLink}
+          <a href="/book-camp.html" class="btn btn-primary">Book Camp</a>
+        </li>
+      </ul>
       <div class="nav-actions">
         ${accountLink}
         <a href="/book-camp.html" class="btn btn-primary">Secure your Camp Spot</a>
