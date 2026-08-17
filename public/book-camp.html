@@ -237,6 +237,13 @@
       }
     });
 
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentUser = getStoredUser();
+      if (currentUser && currentUser.role === 'admin') {
+        document.getElementById('adminViewBanner').style.display = 'flex';
+      }
+    });
+
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const errorEl = document.getElementById('formError');
