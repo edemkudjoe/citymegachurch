@@ -53,6 +53,12 @@
             <input type="hidden" id="ci_hero_image_url" />
           </div>
           <div class="form-group">
+            <label>About Preview Image</label>
+            <div class="upload-zone" id="aboutPreviewUploadZone"><span class="upload-zone-label">Click to upload the photo shown next to "Who We Are" on the homepage</span></div>
+            <img id="aboutPreviewPreview" class="upload-preview" style="display:none;" />
+            <input type="hidden" id="ci_about_preview_image_url" />
+          </div>
+          <div class="form-group">
             <label>History</label>
             <textarea id="ci_history" rows="3"></textarea>
           </div>
@@ -272,10 +278,9 @@
     // ============================================================
     const CI_FIELDS = [
       'church_name','slogan','welcome_message','hero_image_url','history','vision','mission',
-      'lead_pastor_name','lead_pastor_image_url','lead_pastor_bio','address','phone','email',
+      'lead_pastor_name','lead_pastor_image_url','lead_pastor_bio','about_preview_image_url','address','phone','email',
       'google_maps_embed_url','facebook_url','instagram_url','twitter_url','youtube_url','tiktok_url',
     ];
-
     api('/church-info').then(info => {
       CI_FIELDS.forEach(f => {
         const el = document.getElementById(`ci_${f}`);
@@ -286,6 +291,10 @@
         document.getElementById('heroPreview').src = info.hero_image_url;
         document.getElementById('heroPreview').style.display = 'block';
       }
+      if (info.about_preview_image_url) {
+        document.getElementById('aboutPreviewPreview').src = info.about_preview_image_url;
+        document.getElementById('aboutPreviewPreview').style.display = 'block';
+      }
       if (info.lead_pastor_image_url) {
         document.getElementById('pastorPreview').src = info.lead_pastor_image_url;
         document.getElementById('pastorPreview').style.display = 'block';
@@ -294,6 +303,8 @@
 
     initUploadZone(document.getElementById('heroUploadZone'), 'church-assets',
       (url) => document.getElementById('ci_hero_image_url').value = url, document.getElementById('heroPreview'));
+    initUploadZone(document.getElementById('aboutPreviewUploadZone'), 'church-assets',
+      (url) => document.getElementById('ci_about_preview_image_url').value = url, document.getElementById('aboutPreviewPreview'));
     initUploadZone(document.getElementById('pastorUploadZone'), 'church-assets',
       (url) => document.getElementById('ci_lead_pastor_image_url').value = url, document.getElementById('pastorPreview'));
 
