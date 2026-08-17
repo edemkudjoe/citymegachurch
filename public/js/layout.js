@@ -5,23 +5,41 @@
 const NAV_LINKS = [
   { href: '/index.html', label: 'Home' },
   { href: '/about.html', label: 'About' },
+];
+
+const EXPLORE_LINKS = [
   { href: '/services.html', label: 'Services' },
   { href: '/ministries.html', label: 'Ministries' },
   { href: '/events.html', label: 'Events' },
   { href: '/sermons.html', label: 'Sermons' },
-  { href: '/articles.html', label: 'Articles' },
   { href: '/gallery.html', label: 'Gallery' },
-  { href: '/contact.html', label: 'Contact' },
 ];
 
 function renderHeader() {
   const user = getStoredUser();
   const currentPath = window.location.pathname.split('/').pop() || 'index.html';
 
-  const links = NAV_LINKS.map(link => {
+  const primaryLinks = NAV_LINKS.map(link => {
     const isActive = link.href.endsWith(currentPath);
     return `<li><a href="${link.href}" class="${isActive ? 'active' : ''}">${link.label}</a></li>`;
   }).join('');
+
+  const exploreActive = EXPLORE_LINKS.some(link => link.href.endsWith(currentPath));
+  const exploreItems = EXPLORE_LINKS.map(link => {
+    const isActive = link.href.endsWith(currentPath);
+    return `<li><a href="${link.href}" class="${isActive ? 'active' : ''}">${link.label}</a></li>`;
+  }).join('');
+
+  const exploreDropdown = `
+    <li class="nav-dropdown" id="exploreDropdown">
+      <button type="button" class="nav-dropdown-trigger ${exploreActive ? 'active' : ''}" id="exploreTrigger" aria-expanded="false">
+        Explore <span class="nav-caret">&#9662;</span>
+      </button>
+      <ul class="nav-dropdown-menu">${exploreItems}</ul>
+    </li>
+  `;
+
+  const contactLink = `<li><a href="/contact.html" class="${'/contact.html'.endsWith(currentPath) ? 'active' : ''}">Contact</a></li>`;
 
   const accountLink = user
     ? `<a href="${user.role === 'admin' ? '/admin/dashboard.html' : '/dashboard.html'}" class="btn btn-outline">My Account</a>`
@@ -34,7 +52,7 @@ function renderHeader() {
       <a href="/index.html" aria-label="City Mega Church home">
         <img src="/images/logo.png" alt="City Mega Church" class="nav-logo" />
       </a>
-      <ul class="nav-links" id="navLinks">${links}</ul>
+      <ul class="nav-links" id="navLinks">${primaryLinks}${exploreDropdown}${contactLink}</ul>
       <div class="nav-actions">
         ${accountLink}
         <a href="/book-camp.html" class="btn btn-primary">Book Camp</a>
@@ -49,8 +67,21 @@ function renderHeader() {
     const isOpen = navLinks.classList.toggle('open');
     document.getElementById('navToggle').setAttribute('aria-expanded', isOpen);
   });
-}
 
+  const exploreDropdownEl = document.getElementById('exploreDropdown');
+  const exploreTrigger = document.getElementById('exploreTrigger');
+  exploreTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = exploreDropdownEl.classList.toggle('open');
+    exploreTrigger.setAttribute('aria-expanded', isOpen);
+  });
+  document.addEventListener('click', (e) => {
+    if (!exploreDropdownEl.contains(e.target)) {
+      exploreDropdownEl.classList.remove('open');
+      exploreTrigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
 function renderFooter() {
   const footer = document.createElement('footer');
   footer.className = 'site-footer';
