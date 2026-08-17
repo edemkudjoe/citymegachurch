@@ -44,7 +44,7 @@
           <a href="/about.html" class="btn btn-outline mt-32">Learn Our Story</a>
         </div>
         <div>
-          <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=800&q=80" alt="Congregation gathered in worship" style="border-radius:16px; aspect-ratio:4/5; object-fit:cover;" />
+          <img id="aboutPreviewImage" src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=800&q=80" alt="Congregation gathered in worship" style="border-radius:16px; aspect-ratio:4/5; object-fit:cover;" />
         </div>
       </div>
     </div>
@@ -94,6 +94,7 @@
     api('/church-info').then(info => {
       if (info.hero_image_url) document.getElementById('heroImage').src = info.hero_image_url;
       if (info.welcome_message) document.getElementById('welcomeMessage').textContent = info.welcome_message;
+      if (info.about_preview_image_url) document.getElementById('aboutPreviewImage').src = info.about_preview_image_url;
       if (info.slogan) document.getElementById('heroTagline').textContent = info.slogan;
     }).catch(() => {});
 
