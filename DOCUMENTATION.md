@@ -102,14 +102,14 @@ Camp bookings do **not** require login. A booking made while logged out has `use
 
 ## 4. Database Schema
 
-Defined in full in `schema.sql`. Run it once in the Supabase SQL Editor to provision everything below.
+Defined in full in `schema.sql`. Run it in the Supabase SQL Editor to provision everything below. It's also safe to re-run against a database that's already been provisioned — `create table` statements no-op if the table exists, and any `alter table ... add column if not exists` statements at the bottom of the file backfill columns added in later revisions of the schema (e.g. `church_info.about_preview_image_url`) without affecting existing data.
 
 ### Tables
 
 | Table | Purpose |
 |---|---|
 | `users` | Member and admin accounts (custom auth, not Supabase Auth) |
-| `church_info` | Single-row table (`id = 1`) holding church-wide settings: name, slogan, welcome message, history/vision/mission, pastor bio, contact info, social links |
+| `church_info` | Single-row table (`id = 1`) holding church-wide settings: name, slogan, welcome message, history/vision/mission, pastor bio, homepage about-preview image, contact info, social links |
 | `services` | Weekly service schedule entries |
 | `ministries` | Ministry listings |
 | `events` | Upcoming/past events |
