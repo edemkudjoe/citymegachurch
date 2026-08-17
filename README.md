@@ -61,6 +61,7 @@ citymegachurch/
 ├── schema.sql               # Full Supabase database schema — run once in SQL Editor
 ├── vercel.json               # Rewrites all non-/api routes to /public
 ├── package.json
+├── DOCUMENTATION.md
 └── README.md
 ```
 
