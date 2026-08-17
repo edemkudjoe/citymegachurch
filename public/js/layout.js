@@ -105,7 +105,7 @@ function renderFooter() {
         <div class="footer-col">
           <h4>Get Involved</h4>
           <ul>
-            <li><a href="/book-camp.html">Book Prayer Camp</a></li>
+            <li><a href="/book-camp.html">Secure your Camp Spot</a></li>
             <li><a href="/ministries.html">Ministries</a></li>
             <li><a href="/gallery.html">Gallery</a></li>
             <li><a href="/contact.html">Plan a Visit</a></li>
