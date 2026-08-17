@@ -71,3 +71,36 @@ function initUploadZone(zoneEl, bucket, onUploaded, previewEl) {
     }
   });
 }
+
+function addRemoveLink(afterEl, hiddenInputId, previewId, currentUrl) {
+  const existing = afterEl.nextElementSibling;
+  if (existing && existing.classList.contains('remove-upload-link')) {
+    existing.remove();
+  }
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'remove-upload-link';
+  btn.textContent = 'Remove image';
+  btn.addEventListener('click', async () => {
+    if (!confirm('Delete this file permanently? This can\'t be undone.')) return;
+    btn.disabled = true;
+    btn.textContent = 'Removing...';
+    try {
+      await api('/upload', { method: 'DELETE', auth: true, body: { url: currentUrl } });
+      document.getElementById(hiddenInputId).value = '';
+      const preview = document.getElementById(previewId);
+      if (preview) {
+        preview.src = '';
+        preview.style.display = 'none';
+      }
+      btn.remove();
+      showToast('Image deleted.');
+    } catch (err) {
+      showToast(err.message, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Remove image';
+    }
+  });
+  afterEl.insertAdjacentElement('afterend', btn);
+  return btn;
+}
