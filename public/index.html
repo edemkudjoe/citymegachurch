@@ -11,8 +11,8 @@
 <body>
 
   <section class="hero">
-    <div class="hero-bg">
-      <img id="heroImage" src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1600&q=80" alt="" />
+    <div class="hero-bg" id="heroBg">
+      <img id="heroImage" src="" alt="" style="display:none;" />
     </div>
     <svg class="hero-skyline-grid" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <path d="M0,800 L0,600 L100,600 L100,500 L220,500 L220,540 L340,540 L340,420 L380,420 L380,380 L420,380 L420,420 L460,420 L460,560 L600,560 L600,480 L640,480 L640,440 L680,440 L680,480 L720,480 L720,600 L860,600 L860,520 L940,520 L940,580 L1060,580 L1060,460 L1100,460 L1100,420 L1140,420 L1140,460 L1180,460 L1180,600 L1200,600 L1200,800 Z"
@@ -92,7 +92,11 @@
   <script>
     // Load dynamic church info for hero
     api('/church-info').then(info => {
-      if (info.hero_image_url) document.getElementById('heroImage').src = info.hero_image_url;
+      if (info.hero_image_url) {
+        const heroImg = document.getElementById('heroImage');
+        heroImg.src = info.hero_image_url;
+        heroImg.style.display = 'block';
+      }
       if (info.welcome_message) document.getElementById('welcomeMessage').textContent = info.welcome_message;
       if (info.about_preview_image_url) document.getElementById('aboutPreviewImage').src = info.about_preview_image_url;
       if (info.slogan) document.getElementById('heroTagline').textContent = info.slogan;
