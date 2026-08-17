@@ -548,9 +548,15 @@
         initUploadZone(zone, f.bucket, (url) => {
           document.getElementById(`field_${f.key}`).value = url;
         }, preview);
+        if (preview && value_has_content(item, f.key)) {
+          addRemoveLink(preview, `field_${f.key}`, `preview_${f.key}`);
+        }
       });
-
       document.getElementById('itemModal').classList.add('open');
+    }
+
+    function value_has_content(item, key) {
+      return item && item[key];
     }
 
     document.getElementById('closeItemModal').addEventListener('click', () => {
