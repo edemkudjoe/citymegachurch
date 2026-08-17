@@ -24,7 +24,7 @@ function renderHeader() {
   }).join('');
 
   const accountLink = user
-    ? `<a href="/dashboard.html" class="btn btn-outline">My Account</a>`
+    ? `<a href="${user.role === 'admin' ? '/admin/dashboard.html' : '/dashboard.html'}" class="btn btn-outline">My Account</a>`
     : `<a href="/login.html" class="btn btn-outline">Log In</a>`;
 
   const header = document.createElement('header');
