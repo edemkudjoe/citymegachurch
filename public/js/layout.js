@@ -55,7 +55,7 @@ function renderHeader() {
       <ul class="nav-links" id="navLinks">${primaryLinks}${exploreDropdown}${contactLink}</ul>
       <div class="nav-actions">
         ${accountLink}
-        <a href="/book-camp.html" class="btn btn-primary">Book Camp</a>
+        <a href="/book-camp.html" class="btn btn-primary">Secure your Camp Spot</a>
       </div>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
     </nav>
