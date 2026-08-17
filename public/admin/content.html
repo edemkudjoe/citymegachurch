@@ -291,19 +291,19 @@
         const heroPreview = document.getElementById('heroPreview');
         heroPreview.src = info.hero_image_url;
         heroPreview.style.display = 'block';
-        addRemoveLink(heroPreview, 'ci_hero_image_url', 'heroPreview');
+        addRemoveLink(heroPreview, 'ci_hero_image_url', 'heroPreview', info.hero_image_url);
       }
       if (info.about_preview_image_url) {
         const aboutPreview = document.getElementById('aboutPreviewPreview');
         aboutPreview.src = info.about_preview_image_url;
         aboutPreview.style.display = 'block';
-        addRemoveLink(aboutPreview, 'ci_about_preview_image_url', 'aboutPreviewPreview');
+        addRemoveLink(aboutPreview, 'ci_about_preview_image_url', 'aboutPreviewPreview', info.about_preview_image_url);
       }
       if (info.lead_pastor_image_url) {
         const pastorPreview = document.getElementById('pastorPreview');
         pastorPreview.src = info.lead_pastor_image_url;
         pastorPreview.style.display = 'block';
-        addRemoveLink(pastorPreview, 'ci_lead_pastor_image_url', 'pastorPreview');
+        addRemoveLink(pastorPreview, 'ci_lead_pastor_image_url', 'pastorPreview', info.lead_pastor_image_url);
       }
     }).catch(() => {});
 
@@ -549,7 +549,7 @@
           document.getElementById(`field_${f.key}`).value = url;
         }, preview);
         if (preview && value_has_content(item, f.key)) {
-          addRemoveLink(preview, `field_${f.key}`, `preview_${f.key}`);
+          addRemoveLink(preview, `field_${f.key}`, `preview_${f.key}`, item[f.key]);
         }
       });
       document.getElementById('itemModal').classList.add('open');
