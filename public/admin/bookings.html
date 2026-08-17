@@ -28,6 +28,7 @@
     <select id="campFilter">
       <option value="">All Camps</option>
     </select>
+    <button type="button" class="btn btn-outline" id="exportCsvBtn">Export CSV</button>
   </div>
 
   <div class="admin-table-wrap">
@@ -174,6 +175,68 @@
       });
     }
 
+    function exportBookingsToCsv() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const campId = document.getElementById('campFilter').value;
+
+      let filtered = bookings;
+      if (status) filtered = filtered.filter(b => b.status === status);
+      if (campId) filtered = filtered.filter(b => b.camp_id === campId);
+      if (search) {
+        filtered = filtered.filter(b =>
+          b.full_name.toLowerCase().includes(search) ||
+          b.email.toLowerCase().includes(search) ||
+          b.phone_number.toLowerCase().includes(search) ||
+          b.booking_ref.toLowerCase().includes(search)
+        );
+      }
+
+      if (!filtered.length) {
+        alert('No bookings to export.');
+        return;
+      }
+
+      const headers = [
+        'Reference', 'Full Name', 'Camp', 'Email', 'Phone', 'Gender',
+        'Date of Birth', 'Emergency Contact', 'Prayer Request',
+        'Additional Notes', 'Status', 'Created At'
+      ];
+
+      const csvEscape = (val) => {
+        if (val === null || val === undefined) return '';
+        const str = String(val).replace(/"/g, '""');
+        return `"${str}"`;
+      };
+
+      const rows = filtered.map(b => [
+        b.booking_ref,
+        b.full_name,
+        b.prayer_camps ? b.prayer_camps.name : '',
+        b.email,
+        b.phone_number,
+        b.gender,
+        b.date_of_birth,
+        b.emergency_contact,
+        b.prayer_request,
+        b.additional_notes,
+        b.status,
+        b.created_at
+      ].map(csvEscape).join(','));
+
+      const csvContent = [headers.map(csvEscape).join(','), ...rows].join('\r\n');
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const timestamp = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `bookings-export-${timestamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
     async function loadBookings() {
       try {
         bookings = await api('/bookings', { auth: true });
@@ -282,7 +345,8 @@
     document.getElementById('searchInput').addEventListener('input', renderBookings);
     document.getElementById('statusFilter').addEventListener('change', renderBookings);
     document.getElementById('campFilter').addEventListener('change', renderBookings);
-
+    document.getElementById('exportCsvBtn').addEventListener('click', exportBookingsToCsv);
+    
     loadBookings();
     loadCamps();
   </script>
