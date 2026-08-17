@@ -1,10 +1,6 @@
 const { supabase } = require('../lib/supabase');
 const { hashPassword, applyCors } = require('../lib/auth');
 
-// ONE-TIME USE: creates the first admin account.
-// Protected by a SETUP_SECRET env var so randoms can't call it.
-// After you've created your admin, delete this file (or leave the
-// env var unset) so it can never be called again.
 module.exports = async (req, res) => {
   if (applyCors(req, res)) return;
   if (req.method !== 'POST') {
