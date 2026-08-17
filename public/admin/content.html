@@ -311,6 +311,28 @@
       body.core_values = document.getElementById('ci_core_values').value
         .split('\n').map(v => v.trim()).filter(Boolean);
 
+      const SOCIAL_DOMAIN_CHECKS = {
+        facebook_url: { pattern: /facebook\.com|fb\.com/i, label: 'Facebook' },
+        instagram_url: { pattern: /instagram\.com/i, label: 'Instagram' },
+        twitter_url: { pattern: /twitter\.com|x\.com/i, label: 'X / Twitter' },
+        youtube_url: { pattern: /youtube\.com|youtu\.be/i, label: 'YouTube' },
+        tiktok_url: { pattern: /tiktok\.com/i, label: 'TikTok' },
+      };
+      for (const [key, check] of Object.entries(SOCIAL_DOMAIN_CHECKS)) {
+        const value = body[key];
+        if (!value) continue;
+        if (!/^https?:\/\//i.test(value)) {
+          errorEl.textContent = `${check.label} link must start with http:// or https://`;
+          errorEl.classList.add('visible');
+          return;
+        }
+        if (!check.pattern.test(value)) {
+          errorEl.textContent = `That doesn't look like a ${check.label} link — double check it's in the right field.`;
+          errorEl.classList.add('visible');
+          return;
+        }
+      }
+
       btn.disabled = true;
       btn.textContent = 'Saving...';
       try {
