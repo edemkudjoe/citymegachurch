@@ -39,35 +39,6 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed.' });
   }
 
-  if (req.method === 'DELETE') {
-    const { url } = req.body || {};
-    if (!url) return res.status(400).json({ error: 'url is required.' });
-
-    // Supabase public URLs look like:
-    // {SUPABASE_URL}/storage/v1/object/public/{bucket}/{path...}
-    const marker = '/storage/v1/object/public/';
-    const markerIndex = url.indexOf(marker);
-    if (markerIndex === -1) {
-      return res.status(400).json({ error: 'That doesn\'t look like a Supabase Storage URL.' });
-    }
-    const [bucket, ...pathParts] = url.slice(markerIndex + marker.length).split('/');
-    const path = pathParts.join('/');
-
-    if (!ALLOWED_BUCKETS.includes(bucket) || !path) {
-      return res.status(400).json({ error: 'Could not determine which file to delete.' });
-    }
-
-    const { error } = await supabase.storage.from(bucket).remove([path]);
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json({ message: 'File deleted.' });
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed.' });
-  }
-  const admin = requireAdmin(req, res);
-  if (!admin) return;
-
   const { file_name, file_base64, content_type, bucket } = req.body || {};
 
   if (!file_name || !file_base64 || !content_type || !bucket) {
