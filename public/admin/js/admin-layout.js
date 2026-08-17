@@ -34,8 +34,15 @@ function renderAdminLayout() {
   const shell = document.createElement('div');
   shell.className = 'admin-shell';
   shell.innerHTML = `
-    <aside class="admin-sidebar">
+    <div class="admin-topbar">
       <a href="/admin/dashboard.html" class="admin-logo">
+        <img src="/images/logo.png" alt="City Mega Church" />
+        <span>Admin</span>
+      </a>
+      <button class="admin-nav-toggle" id="adminNavToggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+    </div>
+    <aside class="admin-sidebar" id="adminSidebar">
+      <a href="/admin/dashboard.html" class="admin-logo admin-logo-desktop">
         <img src="/images/logo.png" alt="City Mega Church" />
         <span>Admin</span>
       </a>
@@ -59,6 +66,21 @@ function renderAdminLayout() {
   document.getElementById('adminLogoutBtn').addEventListener('click', () => {
     clearToken();
     window.location.href = '/index.html';
+  });
+
+  const toggle = document.getElementById('adminNavToggle');
+  const sidebar = document.getElementById('adminSidebar');
+  toggle.addEventListener('click', () => {
+    const isOpen = sidebar.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', isOpen);
+  });
+
+  // Close the mobile menu after choosing a nav link
+  sidebar.querySelectorAll('.admin-nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
   });
 }
 
