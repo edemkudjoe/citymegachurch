@@ -2,8 +2,6 @@
 
 A church website with member accounts, content management, and a prayer camp registration/booking system, built as static HTML/CSS/JS pages backed by Vercel serverless functions and Supabase (Postgres + Storage).
 
-No build step, no framework, no bundler — every page is plain HTML/CSS/JS that can be edited directly and deployed by pushing to Git or dragging the folder into Vercel.
-
 ---
 
 ## Tech Stack
