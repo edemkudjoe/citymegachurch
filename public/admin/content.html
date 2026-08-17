@@ -288,16 +288,22 @@
       });
       document.getElementById('ci_core_values').value = (info.core_values || []).join('\n');
       if (info.hero_image_url) {
-        document.getElementById('heroPreview').src = info.hero_image_url;
-        document.getElementById('heroPreview').style.display = 'block';
+        const heroPreview = document.getElementById('heroPreview');
+        heroPreview.src = info.hero_image_url;
+        heroPreview.style.display = 'block';
+        addRemoveLink(heroPreview, 'ci_hero_image_url', 'heroPreview');
       }
       if (info.about_preview_image_url) {
-        document.getElementById('aboutPreviewPreview').src = info.about_preview_image_url;
-        document.getElementById('aboutPreviewPreview').style.display = 'block';
+        const aboutPreview = document.getElementById('aboutPreviewPreview');
+        aboutPreview.src = info.about_preview_image_url;
+        aboutPreview.style.display = 'block';
+        addRemoveLink(aboutPreview, 'ci_about_preview_image_url', 'aboutPreviewPreview');
       }
       if (info.lead_pastor_image_url) {
-        document.getElementById('pastorPreview').src = info.lead_pastor_image_url;
-        document.getElementById('pastorPreview').style.display = 'block';
+        const pastorPreview = document.getElementById('pastorPreview');
+        pastorPreview.src = info.lead_pastor_image_url;
+        pastorPreview.style.display = 'block';
+        addRemoveLink(pastorPreview, 'ci_lead_pastor_image_url', 'pastorPreview');
       }
     }).catch(() => {});
 
