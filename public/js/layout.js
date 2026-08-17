@@ -56,7 +56,7 @@ function renderHeader() {
         ${primaryLinks}${exploreDropdown}${contactLink}
         <li class="nav-mobile-actions">
           ${accountLink}
-          <a href="/book-camp.html" class="btn btn-primary">Book Camp</a>
+          <a href="/book-camp.html" class="btn btn-primary">Secure your Camp Spot</a>
         </li>
       </ul>
       <div class="nav-actions">
