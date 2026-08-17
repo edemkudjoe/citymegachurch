@@ -204,8 +204,10 @@
         document.getElementById('campRegOpen').checked = camp.registration_open;
         if (camp.cover_image_url) {
           document.getElementById('campCoverImageUrl').value = camp.cover_image_url;
-          document.getElementById('campCoverPreview').src = camp.cover_image_url;
-          document.getElementById('campCoverPreview').style.display = 'block';
+          const campPreview = document.getElementById('campCoverPreview');
+          campPreview.src = camp.cover_image_url;
+          campPreview.style.display = 'block';
+          addRemoveLink(campPreview, 'campCoverImageUrl', 'campCoverPreview');
         }
       }
       document.getElementById('campModal').classList.add('open');
